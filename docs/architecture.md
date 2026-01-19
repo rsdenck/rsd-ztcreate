@@ -97,3 +97,55 @@ Esta camada é responsável por analisar APIs externas (REST, SOAP, GraphQL) e t
 - **Builder Pattern**: Garante flexibilidade para adicionar novos tipos de exportação no futuro.
 - **SOLID**: Componentes desacoplados facilitam a manutenção.
 - **Segurança**: Credenciais sensíveis são tratadas como macros secretas ou variáveis de ambiente, nunca exportadas em texto plano se configurado pelo usuário.
+
+---
+
+## ⚡ Trigger Creator (Inteligente)
+
+Esta feature permite a criação de gatilhos (triggers) Zabbix de forma assistida, eliminando a necessidade de escrever expressões complexas manualmente. Suporta triggers regulares, de recuperação e protótipos de LLD.
+
+### 🛠️ Componentes Principais
+
+#### 1. Services (`/app/Services/Trigger`)
+- **TriggerValidatorService**: Valida a sintaxe da expressão, existência de itens e compatibilidade de tipos.
+- **TriggerExpressionBuilderService**: Converte seleções da UI (funções, operadores, thresholds) em expressões Zabbix válidas.
+- **TriggerDependencyService**: Gerencia relacionamentos de dependência entre triggers para evitar loops e alertas redundantes.
+
+#### 2. Builders (`/app/Builders/Trigger`)
+- **TriggerBuilder**: Constrói o objeto Trigger padrão.
+- **TriggerPrototypeBuilder**: Constrói protótipos de trigger para Regras de Descoberta (LLD).
+- **TriggerRecoveryBuilder**: Focado na construção de `recovery_expressions` complexas.
+
+#### 3. Models (`/app/Models`)
+- **TriggerDefinition**: Metadados do trigger (nome, severidade, descrição).
+- **TriggerExpression**: Fragmentos de expressões encadeadas.
+- **TriggerFunction**: Mapeamento de funções Zabbix (last, avg, count, etc).
+- **TriggerDependency**: Relacionamento N:N para dependências.
+- **TriggerTag**: Tags específicas aplicadas ao trigger.
+
+#### 4. Exporters (`/app/Exporters`)
+- **ZabbixTriggerExporter**: Especializado na serialização de triggers para o formato JSON Zabbix.
+
+### 🔄 Fluxo de Criação
+
+1. **Seleção de Itens**: O usuário escolhe um ou mais itens (ou protótipos).
+2. **Configuração de Função**: Escolha da função Zabbix (ex: `last()`) e parâmetros.
+3. **Definição de Threshold**: Operadores (>, <, =) e valores (macros ou constantes).
+4. **Severidade**: Definição do nível de criticidade (Information a Disaster).
+5. **Recuperação (Opcional)**: Configuração de expressão de fechamento automático.
+6. **Dependências & Tags**: Ajustes finais de comportamento e organização.
+
+### 📝 Exemplos de Triggers
+
+#### Trigger Simples (High CPU)
+- **Expressão**: `last(/Template/system.cpu.util) > {$CPU.MAX}`
+- **Severidade**: Warning
+
+#### Trigger Prototype (LLD Disk Space)
+- **Expressão**: `last(/Template/vfs.fs.size[{#FSNAME},pused]) > 90`
+- **Severidade**: High
+
+#### Recovery Expression (Hysteresis)
+- **Problem**: `avg(/Template/sensor.temp,5m) > 40`
+- **Recovery**: `avg(/Template/sensor.temp,5m) < 35`
+

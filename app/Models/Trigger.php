@@ -26,4 +26,19 @@ class Trigger extends Model
     {
         return $this->hasMany(Tag::class);
     }
+
+    public function triggerExpressions()
+    {
+        return $this->hasMany(TriggerExpression::class)->orderBy('sort_order');
+    }
+
+    public function dependencies()
+    {
+        return $this->hasMany(TriggerDependency::class, 'trigger_id');
+    }
+
+    public function dependentOf()
+    {
+        return $this->hasMany(TriggerDependency::class, 'depends_on_trigger_id');
+    }
 }

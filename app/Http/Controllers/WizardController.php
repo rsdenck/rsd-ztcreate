@@ -175,7 +175,13 @@ class WizardController extends Controller
             $template = new \App\Models\Template($data);
             $template->setRelation('items', collect($data['items'] ?? [])->map(fn($i) => new \App\Models\Item($i)));
             $template->setRelation('discoveryRules', collect($data['discovery_rules'] ?? [])->map(fn($dr) => new \App\Models\DiscoveryRule($dr)));
-            $template->setRelation('triggers', collect($data['triggers'] ?? [])->map(fn($t) => new \App\Models\Trigger($t)));
+            $template->setRelation('triggers', collect($data['triggers'] ?? [])->map(function($t) {
+                $trigger = new \App\Models\Trigger($t);
+                if (isset($t['tags'])) {
+                    $trigger->setRelation('tags', collect($t['tags'])->map(fn($tag) => new \App\Models\Tag($tag)));
+                }
+                return $trigger;
+            }));
             $template->setRelation('macros', collect($data['macros'] ?? [])->map(fn($m) => new \App\Models\Macro($m)));
             $template->setRelation('tags', collect($data['tags'] ?? [])->map(fn($t) => new \App\Models\Tag($t)));
             $template->setRelation('webScenarios', collect($data['web_scenarios'] ?? [])->map(function($ws) {

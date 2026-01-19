@@ -94,15 +94,19 @@ class ExportService
     private function formatTriggers($triggers): array
     {
         return $triggers->map(fn($trigger) => [
+            'name' => $trigger->name,
             'expression' => $trigger->expression,
             'recovery_mode' => $trigger->recovery_mode,
             'recovery_expression' => $trigger->recovery_expression,
-            'name' => $trigger->name,
             'priority' => $trigger->priority,
             'status' => $trigger->status,
             'description' => $trigger->description,
             'tags' => $this->formatTags($trigger->tags),
             'manual_close' => $trigger->manual_close,
+            'dependencies' => $trigger->dependencies->map(fn($dep) => [
+                'name' => $dep->dependsOnTrigger->name,
+                'expression' => $dep->dependsOnTrigger->expression,
+            ])->toArray(),
         ])->toArray();
     }
 

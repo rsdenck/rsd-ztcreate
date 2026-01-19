@@ -10,8 +10,9 @@ Este documento detalha o status de cada requisito solicitado para o projeto **RS
 | **Macros e Tags** | ✅ | Sistema dinâmico para adição de Macros de usuário e Tags de organização em nível de template (Passo 2). |
 | **Itens Regulares** | ✅ | Interface para definição de itens de coleta, incluindo Chave, Tipo de Informação, Unidades e Intervalos (Passo 3). |
 | **Low Level Discovery (LLD)** | ✅ | Suporte completo a Regras de Descoberta com Protótipos de Itens, essencial para automação (Passo 4). |
-| **Gatilhos (Triggers)** | ✅ | Criação de condições de alerta com suporte a expressões do Zabbix e níveis de severidade (Passo 5). |
+| **Gatilhos (Triggers)** | ✅ | **Zabbix Trigger Creator (Inteligente)**: Sistema avançado com assistente de expressão, suporte a Recovery Mode, Tags e protótipos. |
 | **Web Scenarios (HTTP Tests)** | ✅ | Monitoramento de disponibilidade e performance web, com suporte a múltiplos passos, autenticação e códigos de status (Passo 6). |
 | **Exportação JSON Zabbix** | ✅ | Motor de exportação que gera arquivos JSON formatados e prontos para importação direta no Zabbix. |
 | **Geração via API** | ✅ | Nova camada arquitetural para criar templates automaticamente a partir de endpoints REST/SOAP/GraphQL. |
+| **Trigger Creator Inteligente** | ✅ | Construtor avançado integrado ao Wizard, com validação e suporte a funções complexas. |
 | **Versionamento GitHub** | ✅ | Projeto organizado na raiz do repositório, com histórico limpo no branch `main`. |
