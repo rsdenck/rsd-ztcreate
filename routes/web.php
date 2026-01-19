@@ -19,7 +19,10 @@ Route::prefix('wizard')->name('wizard.')->group(function () {
     
     Route::get('/step5', [WizardController::class, 'showStep5'])->name('step5');
     Route::post('/step5', [WizardController::class, 'step5'])->name('step5.post');
-    
+
+    Route::get('/step6', [WizardController::class, 'showStep6'])->name('step6');
+    Route::post('/step6', [WizardController::class, 'step6'])->name('step6.post');
+
     Route::get('/finish', [WizardController::class, 'finish'])->name('finish');
     Route::post('/export', [WizardController::class, 'export'])->name('export');
 });

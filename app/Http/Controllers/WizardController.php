@@ -100,6 +100,21 @@ class WizardController extends Controller
         $templateData['triggers'] = $request->input('triggers', []);
         Session::put('template_data', $templateData);
 
+        return redirect()->route('wizard.step6');
+    }
+
+    public function showStep6()
+    {
+        return view('wizard.step6');
+    }
+
+    public function step6(Request $request)
+    {
+        // Web Scenarios
+        $templateData = Session::get('template_data');
+        $templateData['web_scenarios'] = $request->input('web_scenarios', []);
+        Session::put('template_data', $templateData);
+
         return redirect()->route('wizard.finish');
     }
 
@@ -118,18 +133,25 @@ class WizardController extends Controller
     {
         $data = Session::get('template_data');
         
-        // For now, let's create a temporary template object to use the ExportService
-        // In a real app, we would save to DB first.
-        
-        // Mocking the export directly from data if DB fails
+        // Create Template model
         $template = new \App\Models\Template($data);
         
-        // Manual mapping because relations won't work without DB
-        $json = $this->exportService->exportToJson($template); 
-        // Note: ExportService needs to be updated to handle array data if we don't use DB
+        // Hydrate collections for ExportService
+        $template->setRelation('items', collect($data['items'] ?? [])->map(fn($i) => new \App\Models\Item($i)));
+        $template->setRelation('discoveryRules', collect($data['discovery_rules'] ?? [])->map(fn($dr) => new \App\Models\DiscoveryRule($dr)));
+        $template->setRelation('triggers', collect($data['triggers'] ?? [])->map(fn($t) => new \App\Models\Trigger($t)));
+        $template->setRelation('macros', collect($data['macros'] ?? [])->map(fn($m) => new \App\Models\Macro($m)));
+        $template->setRelation('tags', collect($data['tags'] ?? [])->map(fn($t) => new \App\Models\Tag($t)));
+        $template->setRelation('webScenarios', collect($data['web_scenarios'] ?? [])->map(function($ws) {
+            $scenario = new \App\Models\WebScenario($ws);
+            $scenario->setRelation('steps', collect($ws['steps'] ?? [])->map(fn($s) => new \App\Models\WebStep($s)));
+            return $scenario;
+        }));
+        
+        $json = $this->exportService->exportToJson($template);
         
         return response($json)
             ->header('Content-Type', 'application/json')
-            ->header('Content-Disposition', 'attachment; filename="'.$template->name.'.json"');
+            ->header('Content-Disposition', 'attachment; filename="'.($template->name ?: 'template').'.json"');
     }
 }

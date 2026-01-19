@@ -24,13 +24,14 @@ class ExportService
                             'version' => $template->vendor_version,
                         ],
                         'groups' => $this->formatGroups($template->groups),
-                        'items' => $this->formatItems($template->items),
-                        'discovery_rules' => $this->formatDiscoveryRules($template->discoveryRules),
-                        'macros' => $this->formatMacros($template->macros),
-                        'tags' => $this->formatTags($template->tags),
+                        'items' => $this->formatItems($template->items ?? collect([])),
+                        'discovery_rules' => $this->formatDiscoveryRules($template->discoveryRules ?? collect([])),
+                        'httptests' => $this->formatWebScenarios($template->webScenarios ?? collect([])),
+                        'macros' => $this->formatMacros($template->macros ?? collect([])),
+                        'tags' => $this->formatTags($template->tags ?? collect([])),
                     ]
                 ],
-                'triggers' => $this->formatTriggers($template->triggers),
+                'triggers' => $this->formatTriggers($template->triggers ?? collect([])),
             ]
         ];
 
