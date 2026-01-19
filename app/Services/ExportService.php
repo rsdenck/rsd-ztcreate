@@ -131,6 +131,69 @@ class ExportService
         ])->toArray();
     }
 
+    private function formatWebScenarios($scenarios): array
+    {
+        return $scenarios->map(fn($scenario) => [
+            'uuid' => $scenario->uuid ?? Str::uuid()->toString(),
+            'name' => $scenario->name,
+            'delay' => $scenario->delay,
+            'retries' => $scenario->retries,
+            'agent' => $scenario->agent,
+            'http_proxy' => $scenario->http_proxy,
+            'variables' => $this->formatKeyValue($scenario->variables),
+            'headers' => $this->formatKeyValue($scenario->headers),
+            'status' => $scenario->status,
+            'authentication' => $scenario->authentication,
+            'http_user' => $scenario->http_user,
+            'http_password' => $scenario->http_password,
+            'verify_peer' => $scenario->verify_peer,
+            'verify_host' => $scenario->verify_host,
+            'ssl_cert_file' => $scenario->ssl_cert_file,
+            'ssl_key_file' => $scenario->ssl_key_file,
+            'ssl_key_password' => $scenario->ssl_key_password,
+            'steps' => $this->formatWebSteps($scenario->steps),
+            'tags' => $this->formatTags($scenario->tags),
+        ])->toArray();
+    }
+
+    private function formatWebSteps($steps): array
+    {
+        return $steps->map(fn($step) => [
+            'name' => $step->name,
+            'url' => $step->url,
+            'query_fields' => $this->formatKeyValue($step->query_fields),
+            'posts' => $step->posts,
+            'variables' => $this->formatKeyValue($step->variables),
+            'headers' => $this->formatKeyValue($step->headers),
+            'follow_redirects' => $step->follow_redirects,
+            'retrieve_mode' => $step->retrieve_mode,
+            'timeout' => $step->timeout,
+            'required' => $step->required,
+            'status_codes' => $step->status_codes,
+        ])->toArray();
+    }
+
+    private function formatKeyValue($jsonString): array
+    {
+        if (!$jsonString) {
+            return [];
+        }
+
+        $data = json_decode($jsonString, true);
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($data as $name => $value) {
+            $result[] = [
+                'name' => $name,
+                'value' => $value,
+            ];
+        }
+        return $result;
+    }
+
     private function formatPreprocessing($preprocessings): array
     {
         return $preprocessings->map(fn($p) => [
