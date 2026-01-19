@@ -8,7 +8,7 @@
 
 ---
 
-## 🚀 Features
+## 📚 Documentation\n\nFor detailed information about project requirements and features, please refer to:\n- [Requirements Coverage](docs/requirements.md) - Check what has been implemented.\n- [Features & Usage Guide](docs/features.md) - Detailed guide on how to use the application.\n\n---\n\n## 🚀 Features
 
 - **Automatic Template Generation**: Create complex Zabbix templates (v6.x / v7.x) in seconds.
 - **Full Low Level Discovery (LLD)**: Deep support for discovery rules, item prototypes, trigger prototypes, and graph prototypes.
