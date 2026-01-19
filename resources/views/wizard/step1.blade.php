@@ -37,6 +37,13 @@
                 <option value="7.0" selected>Zabbix 7.0 LTS</option>
             </select>
         </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Modo de Criação</label>
+            <select name="creation_mode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2">
+                <option value="manual">Manual (Wizard Tradicional)</option>
+                <option value="api">Baseado em API (Geração Automática)</option>
+            </select>
+        </div>
     </div>
 
     <div class="mt-8 flex justify-end">

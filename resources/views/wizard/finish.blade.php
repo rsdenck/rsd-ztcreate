@@ -39,6 +39,14 @@
                 <dt class="text-sm font-medium text-gray-500">Gatilhos</dt>
                 <dd class="text-lg text-gray-900">{{ count($data['triggers'] ?? []) }}</dd>
             </div>
+            @if(($data['creation_mode'] ?? '') === 'api')
+            <div class="md:col-span-2 p-4 bg-blue-50 rounded-md border border-blue-100 mt-4">
+                <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-plug mr-2"></i> Configuração de API Detectada</h4>
+                <p class="text-sm text-blue-700">Base URL: <span class="font-mono">{{ $data['api']['base_url'] }}</span></p>
+                <p class="text-sm text-blue-700">Tipo: {{ $data['api']['api_type'] }} | Endpoints: {{ count($data['api']['endpoints'] ?? []) }}</p>
+                <p class="text-xs text-blue-600 mt-2 italic">* O template será gerado com itens do tipo HTTP Agent e pré-processamento JSONPath automático.</p>
+            </div>
+            @endif
         </dl>
     </div>
 </div>

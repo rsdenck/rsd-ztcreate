@@ -8,6 +8,9 @@ Route::get('/', [WizardController::class, 'index'])->name('wizard.index');
 Route::prefix('wizard')->name('wizard.')->group(function () {
     Route::post('/step1', [WizardController::class, 'step1'])->name('step1');
     
+    Route::get('/api-config', [WizardController::class, 'showApiConfig'])->name('api_config');
+    Route::post('/api-config', [WizardController::class, 'apiConfig'])->name('api_config.post');
+    
     Route::get('/step2', [WizardController::class, 'showStep2'])->name('step2');
     Route::post('/step2', [WizardController::class, 'step2'])->name('step2.post');
     

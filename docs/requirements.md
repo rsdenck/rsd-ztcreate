@@ -13,4 +13,5 @@ Este documento detalha o status de cada requisito solicitado para o projeto **RS
 | **Gatilhos (Triggers)** | ✅ | Criação de condições de alerta com suporte a expressões do Zabbix e níveis de severidade (Passo 5). |
 | **Web Scenarios (HTTP Tests)** | ✅ | Monitoramento de disponibilidade e performance web, com suporte a múltiplos passos, autenticação e códigos de status (Passo 6). |
 | **Exportação JSON Zabbix** | ✅ | Motor de exportação que gera arquivos JSON formatados e prontos para importação direta no Zabbix. |
+| **Geração via API** | ✅ | Nova camada arquitetural para criar templates automaticamente a partir de endpoints REST/SOAP/GraphQL. |
 | **Versionamento GitHub** | ✅ | Projeto organizado na raiz do repositório, com histórico limpo no branch `main`. |

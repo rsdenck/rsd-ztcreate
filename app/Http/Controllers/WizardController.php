@@ -6,17 +6,24 @@ use Illuminate\Http\Request;
 
 use App\Services\TemplateBuilderService;
 use App\Services\ExportService;
+use App\Services\Api\ApiTemplateGeneratorService;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class WizardController extends Controller
 {
     protected $templateBuilder;
     protected $exportService;
+    protected $apiGenerator;
 
-    public function __construct(TemplateBuilderService $templateBuilder, ExportService $exportService)
-    {
+    public function __construct(
+        TemplateBuilderService $templateBuilder, 
+        ExportService $exportService,
+        ApiTemplateGeneratorService $apiGenerator
+    ) {
         $this->templateBuilder = $templateBuilder;
         $this->exportService = $exportService;
+        $this->apiGenerator = $apiGenerator;
     }
 
     public function index()
@@ -33,11 +40,38 @@ class WizardController extends Controller
             'vendor_version' => 'nullable|string',
             'description' => 'nullable|string',
             'zabbix_version' => 'required|string',
+            'creation_mode' => 'required|in:manual,api',
         ]);
 
         Session::put('template_data', $validated);
 
+        if ($validated['creation_mode'] === 'api') {
+            return redirect()->route('wizard.api_config');
+        }
+
         return redirect()->route('wizard.step2');
+    }
+
+    public function showApiConfig()
+    {
+        return view('wizard.api_config');
+    }
+
+    public function apiConfig(Request $request)
+    {
+        $validated = $request->validate([
+            'base_url' => 'required|url',
+            'api_type' => 'required|in:REST,SOAP,GraphQL,Custom',
+            'auth_type' => 'required|string',
+            'endpoints' => 'required|array',
+        ]);
+
+        $templateData = Session::get('template_data');
+        $templateData['api'] = $validated;
+        Session::put('template_data', $templateData);
+
+        // Here we could trigger the ApiAnalyzerService
+        return redirect()->route('wizard.finish');
     }
 
     public function showStep2()
@@ -133,20 +167,23 @@ class WizardController extends Controller
     {
         $data = Session::get('template_data');
         
-        // Create Template model
-        $template = new \App\Models\Template($data);
-        
-        // Hydrate collections for ExportService
-        $template->setRelation('items', collect($data['items'] ?? [])->map(fn($i) => new \App\Models\Item($i)));
-        $template->setRelation('discoveryRules', collect($data['discovery_rules'] ?? [])->map(fn($dr) => new \App\Models\DiscoveryRule($dr)));
-        $template->setRelation('triggers', collect($data['triggers'] ?? [])->map(fn($t) => new \App\Models\Trigger($t)));
-        $template->setRelation('macros', collect($data['macros'] ?? [])->map(fn($m) => new \App\Models\Macro($m)));
-        $template->setRelation('tags', collect($data['tags'] ?? [])->map(fn($t) => new \App\Models\Tag($t)));
-        $template->setRelation('webScenarios', collect($data['web_scenarios'] ?? [])->map(function($ws) {
-            $scenario = new \App\Models\WebScenario($ws);
-            $scenario->setRelation('steps', collect($ws['steps'] ?? [])->map(fn($s) => new \App\Models\WebStep($s)));
-            return $scenario;
-        }));
+        if (isset($data['creation_mode']) && $data['creation_mode'] === 'api') {
+            // API Mode: Use the dedicated Generator Service
+            $template = $this->apiGenerator->generate($data);
+        } else {
+            // Manual Mode: Hydrate collections for ExportService
+            $template = new \App\Models\Template($data);
+            $template->setRelation('items', collect($data['items'] ?? [])->map(fn($i) => new \App\Models\Item($i)));
+            $template->setRelation('discoveryRules', collect($data['discovery_rules'] ?? [])->map(fn($dr) => new \App\Models\DiscoveryRule($dr)));
+            $template->setRelation('triggers', collect($data['triggers'] ?? [])->map(fn($t) => new \App\Models\Trigger($t)));
+            $template->setRelation('macros', collect($data['macros'] ?? [])->map(fn($m) => new \App\Models\Macro($m)));
+            $template->setRelation('tags', collect($data['tags'] ?? [])->map(fn($t) => new \App\Models\Tag($t)));
+            $template->setRelation('webScenarios', collect($data['web_scenarios'] ?? [])->map(function($ws) {
+                $scenario = new \App\Models\WebScenario($ws);
+                $scenario->setRelation('steps', collect($ws['steps'] ?? [])->map(fn($s) => new \App\Models\WebStep($s)));
+                return $scenario;
+            }));
+        }
         
         $json = $this->exportService->exportToJson($template);
         
